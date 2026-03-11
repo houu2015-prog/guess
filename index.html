@@ -93,12 +93,32 @@
 
 <script>
 function speak(text) {
+    let selectedVoice = null;
+
+// 載入可用語音
+speechSynthesis.onvoiceschanged = () => {
+    const voices = speechSynthesis.getVoices();
+
+    // 尋找廣東話女聲（如果有）
+    selectedVoice = voices.find(v =>
+        v.lang === "zh-HK" && v.name.includes("Female")
+    );
+
+    // 如果找不到女聲，就用任何廣東話語音
+    if (!selectedVoice) {
+        selectedVoice = voices.find(v => v.lang === "zh-HK");
+    }
+};
+
+function speak(text) {
     const msg = new SpeechSynthesisUtterance(text);
-    msg.lang = "zh-HK"; // 廣東話
-    msg.rate = 1;       // 語速（1 = 正常）
-    msg.pitch = 1;      // 音調
+    msg.lang = "zh-HK";
+    msg.voice = selectedVoice;  // 使用女聲
+    msg.rate = 1;
+    msg.pitch = 1.2; // 女聲更自然
     speechSynthesis.speak(msg);
-}    
+}
+
 // ===== 遊戲邏輯 =====
 let answer = Math.floor(Math.random() * 101);
 let count = 0;
